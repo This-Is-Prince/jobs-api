@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const jsonwebtoken_1 = require("jsonwebtoken");
 const UserSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
@@ -43,4 +44,10 @@ UserSchema.pre("save", function (next) {
         next();
     });
 });
-exports.default = mongoose_1.default.model("User", UserSchema);
+UserSchema.methods.createJWT = function (userId, name) {
+    return (0, jsonwebtoken_1.sign)({ userId, name }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_LIFETIME,
+    });
+};
+const User = mongoose_1.default.model("User", UserSchema);
+exports.default = User;

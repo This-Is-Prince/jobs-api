@@ -1,7 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import { sign } from "jsonwebtoken";
 
-const UserSchema = new mongoose.Schema({
+interface IUser {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface IUserDocument extends IUser, Document {
+  createJWT: (userId: string, name: string) => string;
+}
+
+const UserSchema: Schema<IUserDocument> = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please provide name."],
@@ -30,4 +41,12 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-export default mongoose.model("User", UserSchema);
+UserSchema.methods.createJWT = function (userId: string, name: string) {
+  return sign({ userId, name }, process.env.JWT_SECRET as string, {
+    expiresIn: process.env.JWT_LIFETIME as string,
+  });
+};
+
+const User = mongoose.model<IUserDocument>("User", UserSchema);
+
+export default User;
