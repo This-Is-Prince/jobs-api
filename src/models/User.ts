@@ -9,7 +9,7 @@ interface IUser {
 }
 
 interface IUserDocument extends IUser, Document {
-  createJWT: (userId: string, name: string) => string;
+  createJWT: () => string;
 }
 
 const UserSchema: Schema<IUserDocument> = new mongoose.Schema({
@@ -41,10 +41,14 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-UserSchema.methods.createJWT = function (userId: string, name: string) {
-  return sign({ userId, name }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_LIFETIME as string,
-  });
+UserSchema.methods.createJWT = function () {
+  return sign(
+    { userId: this._id, name: this.name },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: process.env.JWT_LIFETIME as string,
+    }
+  );
 };
 
 const User = mongoose.model<IUserDocument>("User", UserSchema);

@@ -14,14 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = exports.register = void 0;
 const http_status_codes_1 = require("http-status-codes");
+const errors_1 = require("../errors");
 const User_1 = __importDefault(require("../models/User"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield User_1.default.create(Object.assign({}, req.body));
-    const token = user.createJWT(user._id.toString(), user.name);
+    const token = user.createJWT();
     res.status(http_status_codes_1.StatusCodes.CREATED).json({ user: { name: user.name }, token });
 });
 exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send("login user");
+    const { email, password } = req.body;
+    if (!email || !password) {
+        throw new errors_1.BadRequest("Please provide email and password");
+    }
+    const user = yield User_1.default.findOne({ email });
+    // compare password
+    if (!user) {
+        throw new errors_1.UnauthenticatedError("Invalid Credentials");
+    }
+    const token = user.createJWT();
+    res.status(http_status_codes_1.StatusCodes.OK).json({ token });
 });
 exports.login = login;
