@@ -7,16 +7,19 @@ import express from "express";
 // app
 const app = express();
 
+import authRouter from "./routes/auth";
+import jobsRouter from "./routes/jobs";
+
 import errorHandlerMiddleware from "./middleware/error-handler";
 import notFoundMiddleware from "./middleware/not-found";
+import connectDB from "./db";
 
 // middleware
 app.use(express.json());
 
 // routes
-app.get("/", (req, res) => {
-    res.send("jobs api");
-});
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/jobs", jobsRouter);
 
 // error middleware
 app.use(errorHandlerMiddleware);
@@ -28,6 +31,7 @@ const port = process.env.PORT || 3000;
 const start = async () => {
   try {
     // connectDB
+    await connectDB(process.env.MONGO_URI as string);
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}...`);
     });
