@@ -10,6 +10,7 @@ interface IUser {
 
 interface IUserDocument extends IUser, Document {
   createJWT: () => string;
+  comparePassword: (candidatePassword: string) => Promise<boolean>;
 }
 
 const UserSchema: Schema<IUserDocument> = new mongoose.Schema({
@@ -49,6 +50,12 @@ UserSchema.methods.createJWT = function () {
       expiresIn: process.env.JWT_LIFETIME as string,
     }
   );
+};
+
+UserSchema.methods.comparePassword = async function (
+  candidatePassword: string
+) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
 const User = mongoose.model<IUserDocument>("User", UserSchema);

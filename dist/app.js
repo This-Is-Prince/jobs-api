@@ -24,11 +24,12 @@ const jobs_1 = __importDefault(require("./routes/jobs"));
 const error_handler_1 = __importDefault(require("./middleware/error-handler"));
 const not_found_1 = __importDefault(require("./middleware/not-found"));
 const db_1 = __importDefault(require("./db"));
+const authentication_1 = __importDefault(require("./middleware/authentication"));
 // middleware
 app.use(express_1.default.json());
 // routes
 app.use("/api/v1/auth", auth_1.default);
-app.use("/api/v1/jobs", jobs_1.default);
+app.use("/api/v1/jobs", authentication_1.default, jobs_1.default);
 // error middleware
 app.use(error_handler_1.default);
 app.use(not_found_1.default);

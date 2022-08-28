@@ -13,13 +13,14 @@ import jobsRouter from "./routes/jobs";
 import errorHandlerMiddleware from "./middleware/error-handler";
 import notFoundMiddleware from "./middleware/not-found";
 import connectDB from "./db";
+import authMiddleware from "./middleware/authentication";
 
 // middleware
 app.use(express.json());
 
 // routes
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/jobs", jobsRouter);
+app.use("/api/v1/jobs", authMiddleware, jobsRouter);
 
 // error middleware
 app.use(errorHandlerMiddleware);

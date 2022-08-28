@@ -28,9 +28,13 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         throw new errors_1.BadRequest("Please provide email and password");
     }
     const user = yield User_1.default.findOne({ email });
-    // compare password
     if (!user) {
         throw new errors_1.UnauthenticatedError("Invalid Credentials");
+    }
+    const isPasswordCorrect = yield user.comparePassword(password);
+    // compare password
+    if (!isPasswordCorrect) {
+        throw new errors_1.UnauthenticatedError("Please provide a valid password");
     }
     const token = user.createJWT();
     res.status(http_status_codes_1.StatusCodes.OK).json({ token });
