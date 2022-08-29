@@ -25,7 +25,7 @@ exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (!email || !password) {
-        throw new errors_1.BadRequest("Please provide email and password");
+        throw new errors_1.BadRequestError("Please provide email and password");
     }
     const user = yield User_1.default.findOne({ email });
     if (!user) {

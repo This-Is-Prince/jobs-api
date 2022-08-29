@@ -10,11 +10,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_status_codes_1 = require("http-status-codes");
-const errors_1 = require("../errors");
+// import { CustomError } from "../errors";
 const errorHandlerMiddleware = (err, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    if (err instanceof errors_1.CustomError) {
-        return res.status(err.statusCode).json({ msg: err.message });
+    let customError = {
+        // set default
+        statusCode: err.statusCode || http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR,
+        msg: err.message || "Something went wrong try again later",
+    };
+    // if (err instanceof CustomError) {
+    //   return res.status(err.statusCode).json({ msg: err.message });
+    // }
+    if (err.code && err.code === 11000) {
+        customError.msg = `Duplicate value entered for ${Object.keys(err.keyValue)} field, please choose another value`;
+        customError.statusCode = 400;
     }
-    res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({ err });
+    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ err });
+    res.status(customError.statusCode).json({ msg: customError.msg });
 });
 exports.default = errorHandlerMiddleware;
