@@ -55,8 +55,13 @@ const updateJob = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.updateJob = updateJob;
 const deleteJob = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _e;
     const { jobId } = req.params;
-    const job = yield Job_1.default.deleteOne({ _id: jobId });
+    const userId = (_e = req.user) === null || _e === void 0 ? void 0 : _e.userId;
+    const job = yield Job_1.default.findOneAndRemove({ createdBy: userId, _id: jobId });
+    if (!job) {
+        throw new errors_1.NotFoundError(`No job with id '${jobId}'`);
+    }
     res.status(http_status_codes_1.StatusCodes.OK).json({ job });
 });
 exports.deleteJob = deleteJob;
