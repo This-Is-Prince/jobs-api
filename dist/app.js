@@ -16,6 +16,10 @@ require("express-async-errors");
 const dotenv_1 = require("dotenv");
 // env variables
 (0, dotenv_1.config)();
+const helmet_1 = __importDefault(require("helmet"));
+const cors_1 = __importDefault(require("cors"));
+const xss_clean_1 = __importDefault(require("xss-clean"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const express_1 = __importDefault(require("express"));
 // app
 const app = (0, express_1.default)();
@@ -26,7 +30,15 @@ const not_found_1 = __importDefault(require("./middleware/not-found"));
 const db_1 = __importDefault(require("./db"));
 const authentication_1 = __importDefault(require("./middleware/authentication"));
 // middleware
+app.set("trust proxy", 1);
+app.use((0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000,
+    max: 100, // limit each IP to 100 requests per windowMs
+}));
 app.use(express_1.default.json());
+app.use((0, helmet_1.default)());
+app.use((0, cors_1.default)());
+app.use((0, xss_clean_1.default)());
 // routes
 app.use("/api/v1/auth", auth_1.default);
 app.use("/api/v1/jobs", authentication_1.default, jobs_1.default);
